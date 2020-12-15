@@ -13,15 +13,15 @@ public class StorageProperties {
 
     /**
      * Folder location for storing files
-     */
     String userDirectory = Paths.get("")
             .toAbsolutePath()
             .toString();
     File dir = new File(userDirectory + "/epiStore");
     boolean successful = dir.mkdir();
-    
-    private String location = userDirectory + "/epiStore";
 
+    private String location = userDirectory + "/epiStore";
+    */
+    private String location = "/home/tomcat/fileStorage/";
     public String getLocation() {
         return location;
     }

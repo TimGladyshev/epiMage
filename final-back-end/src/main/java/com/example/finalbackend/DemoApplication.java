@@ -9,7 +9,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 
@@ -18,9 +20,14 @@ import java.util.Optional;
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)
 @EnableSpringConfigured
-public class DemoApplication {
+public class DemoApplication extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
+	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+		return builder.sources(DemoApplication.class);
 	}
 
 	@Bean
@@ -32,15 +39,6 @@ public class DemoApplication {
 			storageService.deleteAll();
 			storageService.init();
 			 */
-			Optional<Global> global = globalsRepository.findById(Long.parseLong("1"));
-			if (!global.isPresent()) {
-				Global glob = new Global();
-				glob.setTotalSuccess(Long.parseLong("0"));
-				glob.setTotalUploads(Long.parseLong("0"));
-				glob.setTotalShared(Long.parseLong("0"));
-				glob.setTotalDownLoaded(Long.parseLong("0"));
-				globalsRepository.save(glob);
-			}
 		};
 	}
 }

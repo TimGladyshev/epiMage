@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import com.example.finalbackend.services.StorageService;
@@ -35,8 +36,9 @@ public class FileSystemStorageService implements StorageService {
                 throw new StorageException("Failed to store empty file.");
             }
             Path destinationFile = this.rootLocation.resolve(
-                    Paths.get(file.getOriginalFilename()))
+                    Paths.get(Objects.requireNonNull(file.getOriginalFilename())))
                     .normalize().toAbsolutePath();
+            System.out.print(destinationFile);
             if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
                 // This is a security check
                 throw new StorageException(
@@ -88,6 +90,13 @@ public class FileSystemStorageService implements StorageService {
         catch (MalformedURLException e) {
             throw new StorageFileNotFoundException("Could not read file: " + filename, e);
         }
+    }
+
+
+    public void deleteFile(String filename) {
+        Path file= load(filename);
+        FileSystemUtils.deleteRecursively(file.toFile());
+
     }
 
     @Override

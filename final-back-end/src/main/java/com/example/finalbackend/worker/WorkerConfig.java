@@ -15,8 +15,8 @@ public class WorkerConfig {
     @Bean
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
-        pool.setCorePoolSize(1);
-        pool.setMaxPoolSize(1);
+        pool.setCorePoolSize(3);
+        pool.setMaxPoolSize(3);
         pool.setWaitForTasksToCompleteOnShutdown(true);
         return pool;
     }

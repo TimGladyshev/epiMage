@@ -99,6 +99,32 @@ public class BatchController {
         }
     }
 
+    @PostMapping("/share/{userId}")
+    @PreAuthorize(("hasRole('CONTRIBUTOR')"))
+    public ResponseEntity<?> postUpload(@PathVariable("userId") String userId,
+        @RequestBody Upload upload) {
+        Optional<User> user = userRepository.findById(Long.parseLong(userId));
+        Optional<Global> global = globalsRepository.getFirstById(Long.parseLong("1"));
+        UploadShared shared = new UploadShared(upload);
+        if (user.isPresent() && global.isPresent()) {
+            User u = user.get();
+            Global glob = global.get();
+            u.addShared(shared);
+            if (u.getSharedCount() != null) {
+                u.setSharedCount(u.getSharedCount() + 1);
+            } else {
+                u.setSharedCount(1);
+            }
+            uploadRepository.save(upload);
+            userRepository.save(u);
+            glob.setTotalShared(glob.getTotalShared() + 1);
+            globalsRepository.save(glob);
+            return ResponseEntity.ok(u);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
 
 }

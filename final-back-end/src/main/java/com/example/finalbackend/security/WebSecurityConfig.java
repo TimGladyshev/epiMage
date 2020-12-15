@@ -56,9 +56,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/epiMage/auth/**").permitAll()
-                .antMatchers("/epiMage/test/**").permitAll()
+                .antMatchers("/epiMage/data/**").permitAll()
                 .antMatchers("/file/**").permitAll()
                 .antMatchers("/stats/**").permitAll()
+                .antMatchers("/upload/**").permitAll()
+                .antMatchers("/data/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

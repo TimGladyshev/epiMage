@@ -47,6 +47,13 @@ public class User {
     )
     private List<Upload> uploads = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<UploadShared> shared = new ArrayList<>();
+
     private Integer batchCount;
     private Integer completedCount;
     private Integer sharedCount;
@@ -147,5 +154,17 @@ public class User {
 
     public void setSharedCount(Integer sharedCount) {
         this.sharedCount = sharedCount;
+    }
+
+    public List<UploadShared> getShared() {
+        return shared;
+    }
+
+    public void setShared(List<UploadShared> shared) {
+        this.shared = shared;
+    }
+
+    public void addShared(UploadShared s) {
+        this.shared.add(s);
     }
 }

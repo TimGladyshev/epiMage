@@ -192,6 +192,29 @@ public class FileUploadController {
         }
     }
 
+    @PostMapping("/{uploadId}/annotate")
+    @PreAuthorize("hasRole('CONTRIBUTOR')")
+    public ResponseEntity<?> annotate(@PathVariable("uploadId") String uploadId, @RequestParam("file") MultipartFile file,
+                                      RedirectAttributes redirectAttributes) {
+        String path = storageService.store(file);
+        Optional<Upload> foundUpload = uploadRepository.findById(Long.parseLong(uploadId));
+        if (foundUpload.isPresent()) {
+            Upload up = foundUpload.get();
+            up.setAnnotation(path);
+            uploadRepository.save(up);
+            return ResponseEntity.ok(up);
+        } else {
+            return ResponseEntity.badRequest().body(path);
+        }
+    }
+
+    @DeleteMapping("/{fileId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> deleteFile(@PathVariable String fileId) {
+        storageService.deleteFile(fileId);
+        return ResponseEntity.ok().build();
+    }
+
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
         return ResponseEntity.notFound().build();
