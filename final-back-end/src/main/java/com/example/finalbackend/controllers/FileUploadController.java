@@ -1,14 +1,8 @@
 package com.example.finalbackend.controllers;
 
-import com.example.finalbackend.models.Global;
-import com.example.finalbackend.models.Upload;
-import com.example.finalbackend.models.User;
-import com.example.finalbackend.models.openCpuFileUploadOperation;
+import com.example.finalbackend.models.*;
 import com.example.finalbackend.payloads.response.MessageResponse;
-import com.example.finalbackend.repositories.BatchRepository;
-import com.example.finalbackend.repositories.GlobalsRepository;
-import com.example.finalbackend.repositories.UploadRepository;
-import com.example.finalbackend.repositories.UserRepository;
+import com.example.finalbackend.repositories.*;
 import com.example.finalbackend.services.StorageService;
 import com.example.finalbackend.services.storage.StorageFileNotFoundException;
 import com.example.finalbackend.worker.ProcessData;
@@ -37,8 +31,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,7 +42,7 @@ import java.util.stream.Collectors;
  * Based on tutorial from Tamaro Skaljic Username: tamaro-skaljic on GitHub.
  */
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600, methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT})
 @RestController
 @RequestMapping("/file")
 public class FileUploadController {
@@ -60,6 +56,9 @@ public class FileUploadController {
 
     @Autowired
     GlobalsRepository globalsRepository;
+
+    @Autowired
+    SharedRepository sharedRepository;
 
     @Autowired
     ocpuExecutor executor;
@@ -208,9 +207,56 @@ public class FileUploadController {
         }
     }
 
+    @DeleteMapping("/{userId}/{uploadID}/delete")
+    @PreAuthorize("(hasRole('USER'))")
+    public ResponseEntity<?> deleteUpload(@PathVariable("userId") String userId,
+                                          @PathVariable("uploadID") String uploadId) {
+        Optional<User> user = userRepository.findById(Long.parseLong(userId));
+        if (user.isPresent()) {
+            User u = user.get();
+            List<Upload> uploads = u.getUploads();
+            List<UploadShared> sharedList = u.getShared();
+            Upload delete = new Upload();
+            boolean found = false;
+            for (int i = 0; i < uploads.size(); i++) {
+                if (uploads.get(i).getId().toString().equals(uploadId)) {
+                    delete = uploads.get(i);
+                    uploads.remove(i);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found && delete.getSample() != null) {
+                storageService.deleteFile(delete.getSample());
+            }
+
+            if (found && delete.getResult() != null) {
+                storageService.deleteFile(delete.getResult());
+            }
+
+            if (found) {
+                for (int i = 0; i < sharedList.size(); i++) {
+                    if (sharedList.get(i).getName().equals(delete.getName())) {
+                        sharedList.remove(i);
+                    }
+                }
+            }
+
+            u.setUploads(uploads);
+            u.setShared(sharedList);
+            u.setSharedCount(sharedList.size());
+
+            userRepository.save(u);
+
+            return ResponseEntity.ok(u);
+        }
+        return ResponseEntity.status(505).build();
+    }
+
     @DeleteMapping("/{fileId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> deleteFile(@PathVariable String fileId) {
+    public ResponseEntity<?> deleteFile(@PathVariable("fileId") String fileId) {
         storageService.deleteFile(fileId);
         return ResponseEntity.ok().build();
     }
