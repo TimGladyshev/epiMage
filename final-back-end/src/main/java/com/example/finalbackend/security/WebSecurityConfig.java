@@ -58,6 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/epiMage/auth/**").permitAll()
                 .antMatchers("/epiMage/test/**").permitAll()
                 .antMatchers("/file/**").permitAll()
+                .antMatchers("/stats/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

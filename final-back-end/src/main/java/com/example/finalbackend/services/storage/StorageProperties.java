@@ -3,6 +3,10 @@ package com.example.finalbackend.services.storage;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 @ConfigurationProperties("storage")
 public class StorageProperties {
@@ -10,7 +14,13 @@ public class StorageProperties {
     /**
      * Folder location for storing files
      */
-    private String location = "/storage/";
+    String userDirectory = Paths.get("")
+            .toAbsolutePath()
+            .toString();
+    File dir = new File(userDirectory + "/epiStore");
+    boolean successful = dir.mkdir();
+    
+    private String location = userDirectory + "/epiStore";
 
     public String getLocation() {
         return location;
