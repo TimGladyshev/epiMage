@@ -10,7 +10,7 @@ public class StorageProperties {
     /**
      * Folder location for storing files
      */
-    private String location = "/home/tim/Documents/springStorage/";
+    private String location = "/storage/";
 
     public String getLocation() {
         return location;

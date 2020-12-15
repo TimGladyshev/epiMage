@@ -28,8 +28,10 @@ public class DemoApplication {
 			StorageService storageService,
 			GlobalsRepository globalsRepository) {
 		return (args) -> {
+			/*
 			storageService.deleteAll();
 			storageService.init();
+			 */
 			Optional<Global> global = globalsRepository.findById(Long.parseLong("1"));
 			if (!global.isPresent()) {
 				Global glob = new Global();
